@@ -9,7 +9,7 @@ package main
 // it represents
 
 // tokentype represents lexical token types
-type TokenType int
+type TokenType = int
 
 const (
 	//single-character tokens
