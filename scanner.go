@@ -1,5 +1,7 @@
 package main
 
+import "strconv"
+
 type Scanner struct {
 	source  string
 	tokens  []Token
@@ -109,7 +111,11 @@ func (s Scanner) ScanToken() {
 		s.string()
 
 	default:
-		LoxError(NewLox(true), s.line, "Unexpected character.")
+		if s.isDigit(c) {
+			s.number()
+		} else {
+			LoxError(NewLox(true), s.line, "Unexpected character.")
+		}
 	}
 }
 
@@ -163,4 +169,38 @@ func (s *Scanner) string() {
 	//trim the surrounding quotes
 	value := s.source[s.start+1 : s.current-1]
 	s.addToken(STRING, value)
+}
+
+func (s Scanner) isDigit(c byte) bool {
+	return c >= '0' && c <= '9'
+}
+
+func (s *Scanner) number() {
+	for s.isDigit(s.peek()) {
+		s.advance()
+	}
+
+	//look out for a fractional part
+	if s.peek() == '.' && s.isDigit(s.peekNext()) {
+		//consume "."
+		s.advance()
+	}
+	for s.isDigit(s.peek()) {
+		s.advance()
+	}
+
+	repr, err := strconv.ParseFloat(s.source[s.start:s.current], 64)
+	if err != nil {
+		LoxError(NewLox(false), s.line, "Error converting to float type.")
+		return
+	}
+	s.addToken(NUMBER, repr)
+}
+
+func (s Scanner) peekNext() byte {
+	if s.current+1 >= len(s.source) {
+		//return null string
+		return '\x00'
+	}
+	return s.source[s.current+1]
 }
