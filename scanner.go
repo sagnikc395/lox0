@@ -83,6 +83,31 @@ func (s Scanner) ScanToken() {
 		} else {
 			s.addToken(GREATER, nil)
 		}
+
+	case '/':
+		//for longer lexemes ,division and comments
+		if s.match('/') {
+			//comment goes until the end of the line
+			for s.peek() != '\n' && !s.isAtEnd() {
+				s.advance()
+			}
+		} else {
+			s.addToken(SLASH, nil)
+		}
+
+	//scanning meaningless characters
+	case ' ':
+	case '\r':
+	case '\t':
+		//ignore whitespaces
+		break
+	case '\n':
+		s.line++
+
+	//string literals
+	case '"':
+		s.string()
+
 	default:
 		LoxError(NewLox(true), s.line, "Unexpected character.")
 	}
@@ -108,4 +133,34 @@ func (s *Scanner) match(expected byte) bool {
 
 	s.current += 1
 	return true
+}
+
+// peek one token ahead helper function
+func (s *Scanner) peek() byte {
+	if s.isAtEnd() {
+		//return null byte
+		return '\x00'
+	}
+	return s.source[s.current]
+}
+
+func (s *Scanner) string() {
+	for s.peek() != '"' && !s.isAtEnd() {
+		if s.peek() == '\n' {
+			s.line++
+		}
+		s.advance()
+	}
+
+	if s.isAtEnd() {
+		LoxError(NewLox(false), s.line, "Unterminated string.")
+		return
+	}
+
+	//close ".
+	s.advance()
+
+	//trim the surrounding quotes
+	value := s.source[s.start+1 : s.current-1]
+	s.addToken(STRING, value)
 }
