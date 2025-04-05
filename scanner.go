@@ -19,7 +19,7 @@ func NewScanner(source string, tokens []string) Scanner {
 }
 
 func (s *Scanner) ScanTokens() []Token {
-	for !s.IsAtEnd() {
+	for !s.isAtEnd() {
 		s.start = s.current
 	}
 	s.tokens = append(s.tokens, NewToken(EOF, "", nil, s.line))
@@ -27,7 +27,7 @@ func (s *Scanner) ScanTokens() []Token {
 }
 
 // helper to check if we have consumed all the characters
-func (s Scanner) IsAtEnd() bool {
+func (s Scanner) isAtEnd() bool {
 	return s.current >= len(s.source)
 }
 
@@ -58,6 +58,33 @@ func (s Scanner) ScanToken() {
 		s.addToken(PLUS, nil)
 	case '*':
 		s.addToken(STAR, nil)
+	case '!':
+		if s.match('=') {
+			s.addToken(BANG_EQUAL, nil)
+		} else {
+			s.addToken(BANG, nil)
+		}
+	case '=':
+		if s.match('=') {
+			s.addToken(EQUAL_EQUAL, nil)
+		} else {
+			s.addToken(EQUAL, nil)
+		}
+
+	case '<':
+		if s.match('=') {
+			s.addToken(LESS_EQUAL, nil)
+		} else {
+			s.addToken(LESS, nil)
+		}
+	case '>':
+		if s.match('=') {
+			s.addToken(GREATER_EQUAL, nil)
+		} else {
+			s.addToken(GREATER, nil)
+		}
+	default:
+		LoxError(NewLox(true), s.line, "Unexpected character.")
 	}
 }
 
@@ -69,4 +96,16 @@ func (s Scanner) advance() byte {
 func (s *Scanner) addToken(tokenType TokenType, literal interface{}) {
 	text := s.source[s.start:s.current]
 	s.tokens = append(s.tokens, NewToken(tokenType, text, literal, s.line))
+}
+
+func (s *Scanner) match(expected byte) bool {
+	if s.isAtEnd() {
+		return false
+	}
+	if s.source[s.current] != expected {
+		return false
+	}
+
+	s.current += 1
+	return true
 }

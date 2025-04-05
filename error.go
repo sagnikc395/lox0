@@ -5,7 +5,7 @@ import "fmt"
 // error handling is essential for production level compilers
 // hanlding errors gracefully is vital
 
-func (l *Lox) loxerror(line int, message string) {
+func LoxError(l *Lox, line int, message string) {
 	report(line, "", message)
 	l.hadError = true
 }
