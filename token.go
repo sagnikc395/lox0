@@ -29,7 +29,7 @@ func NewToken(tokenType TokenType, lexeme string, literal interface{}, line int)
 
 func (t Token) String() string {
 	if t.Literal != nil {
-		return fmt.Sprintf("%s %s %v", t.Type, t.Lexeme, t.Literal)
+		return fmt.Sprintf("%v %v %v", t.Type, t.Lexeme, t.Literal)
 	}
-	return fmt.Sprintf("%s %s", t.Type, t.Lexeme)
+	return fmt.Sprintf("%v %v", t.Type, t.Lexeme)
 }
