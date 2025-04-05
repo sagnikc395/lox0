@@ -20,13 +20,15 @@ func NewLox(hadError bool) *Lox {
 func main() {
 	args := os.Args[1:]
 
+	//create new lox contenxt
+	l := NewLox(false)
 	if len(args) > 1 {
 		fmt.Println("Usage: lox0 [script]")
 		os.Exit(64)
 	} else if len(args) == 1 {
-		runFile(args[0])
+		l.runFile(args[0])
 	} else {
-		runPrompt()
+		l.runPrompt()
 	}
 }
 
