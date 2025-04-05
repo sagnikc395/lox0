@@ -8,7 +8,13 @@ import (
 )
 
 type Lox struct {
-	hadError string
+	hadError bool
+}
+
+func NewLox(hadError bool) *Lox {
+	return &Lox{
+		hadError: hadError,
+	}
 }
 
 func main() {
@@ -30,13 +36,16 @@ func main() {
 // if we start lox0 from command line and give it a path to a file, it
 // will read the file and execute it.
 
-func runFile(path string) error {
+func (l *Lox) runFile(path string) error {
 	contents, err := os.ReadFile(path)
 	if err != nil {
 		log.Fatal(err)
 		return err
 	}
 	run(string(contents))
+	if l.hadError {
+		os.Exit(65)
+	}
 	return nil
 }
 
@@ -44,7 +53,7 @@ func runFile(path string) error {
 // fire up our interpreter and it will drop us into a prompt where we can
 // enter and execute code one line at a time
 
-func runPrompt() error {
+func (l *Lox) runPrompt() error {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for scanner.Scan() {
@@ -54,6 +63,7 @@ func runPrompt() error {
 			break
 		}
 		run(line)
+		l.hadError = false
 	}
 	return nil
 }
