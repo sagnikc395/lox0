@@ -113,6 +113,10 @@ func (s Scanner) ScanToken() {
 	default:
 		if s.isDigit(c) {
 			s.number()
+		} else if s.isAlpha(c) {
+			//rn assuming any lexeme starting with a letter
+			//or underscore is an identifier
+			s.identifier()
 		} else {
 			LoxError(NewLox(true), s.line, "Unexpected character.")
 		}
@@ -203,4 +207,19 @@ func (s Scanner) peekNext() byte {
 		return '\x00'
 	}
 	return s.source[s.current+1]
+}
+
+func (s Scanner) identifier() {
+	for s.isAlphaNumeric(s.peek()) {
+		s.advance()
+	}
+	s.addToken(IDENTIFIER, nil)
+}
+
+func (s Scanner) isAlpha(c byte) bool {
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
+}
+
+func (s Scanner) isAlphaNumeric(c byte) bool {
+	return s.isAlpha(c) || s.isDigit(c)
 }
