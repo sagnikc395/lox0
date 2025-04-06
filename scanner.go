@@ -2,6 +2,30 @@ package main
 
 import "strconv"
 
+//handle keywords, we see if the identifier's lexeme
+// is one of the reserved words.
+// if so, we use a token type specific to that keyword.
+// defining the set of reserved words in a map
+
+var keywords = map[string]TokenType{
+	"and":    AND,
+	"class":  CLASS,
+	"else":   ELSE,
+	"false":  FALSE,
+	"for":    FOR,
+	"fun":    FUN,
+	"if":     IF,
+	"nil":    NIL,
+	"or":     OR,
+	"print":  PRINT,
+	"return": RETURN,
+	"super":  SUPER,
+	"this":   THIS,
+	"true":   TRUE,
+	"var":    VAR,
+	"while":  WHILE,
+}
+
 type Scanner struct {
 	source  string
 	tokens  []Token
@@ -209,9 +233,15 @@ func (s Scanner) peekNext() byte {
 	return s.source[s.current+1]
 }
 
+// we use the keyword's token type , else a regular user-defined identifier
 func (s Scanner) identifier() {
 	for s.isAlphaNumeric(s.peek()) {
 		s.advance()
+	}
+	text := s.source[s.start:s.current]
+	tokenType := keywords[text]
+	if tokenType == NIL {
+		tokenType = IDENTIFIER
 	}
 	s.addToken(IDENTIFIER, nil)
 }
