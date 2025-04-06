@@ -62,13 +62,25 @@ func defineAST(outputDir, baseName string, types []string) error {
 	return nil
 }
 
-func defineType(file *os.File, baseName, className, fields string) {
+func defineType(file *os.File, baseName, className, fieldList string) {
 	fmt.Fprintf(file, "\ntype %s struct {\n", className)
-	for _, field := range strings.Split(fields, ",") {
+	fields := strings.Split(fieldList, ",")
+	for _, field := range fields {
 		field = strings.TrimSpace(field)
 		fieldParts := strings.SplitN(field, " ", 2)
-		fmt.Fprintln(file, "\t%s %s\n", strings.Title(fieldParts[1]), fieldParts[0])
+		fmt.Fprintf(file, "\t%s %s\n", strings.Title(fieldParts[1]), fieldParts[0])
+	}
+	fmt.Fprintln(file, "}")
+
+	//constructor-like initializer
+	fmt.Fprintf(file, "\nfunc New%s(%s) *%s{\n", className, fieldList, className)
+	fmt.Fprintf(file, "\treturn &%s{\n", className)
+	for _, field := range fields {
+		fieldParts := strings.SplitN(strings.TrimSpace(field), " ", 2)
+		fmt.Fprintf(file, "\t\t%s: %s,\n", strings.Title(fieldParts[1]), fieldParts[1])
 	}
 
+	fmt.Fprintln(file, "\t}")
 	fmt.Fprintln(file, "}")
+
 }
