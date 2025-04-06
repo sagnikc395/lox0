@@ -1,6 +1,6 @@
 # https://taskfile.dev
 
-version: '3'
+version: "3"
 
 vars:
   GREETING: Hello, World!
@@ -12,7 +12,5 @@ tasks:
     silent: true
   build:
     cmds:
-      - mkdir -p dist 
-      - go build -o lox0 ./main.go ./token.go ./tokentype.go ./scanner.go ./consts.go ./error.go
-
-  
+      - mkdir -p dist
+      - go build -o ./dist/lox0 ./main.go ./token.go ./tokentype.go ./scanner.go ./consts.go ./error.go
